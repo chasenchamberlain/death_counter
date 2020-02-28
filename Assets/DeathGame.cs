@@ -5,53 +5,75 @@ using UnityEngine.UI;
 
 public class DeathGame : MonoBehaviour
 {
-    
+
     public Text deathCountText;
-    public int deathCount;
-    public string gameName;
+    private int deathCount;
+    private string gameName;
     public Text gameNameText;
-    
     public Dropdown dropdown;
-    public void addDeathCount ()
+    public Button add;
+    public Button minus;
+    public Button deleteAllBtn;
+    public Button deleteGameBtn;
+    public InputField deaths;
+
+    private bool gameSelected = false;
+
+    private Dictionary<string, int> gamesAndDeaths = new Dictionary<string, int>(); 
+
+    public void AddDeathCount()
     {
         deathCount++;
-
-        updatePrefs();
+        UpdatePrefs();
     }
 
-    public void minusDeathCount ()
+    public void MinusDeathCount()
     {
         deathCount--;
-
-        updatePrefs();
+        UpdatePrefs();
     }
 
 
-    void updatePrefs()
+    void UpdatePrefs()
     {
         deathCountText.text = deathCount.ToString();
-        PlayerPrefs.SetInt(gameName, deathCount);
+        //PlayerPrefs.SetInt(gameName, deathCount);
+        //string seralizedGames = MySerali
         System.IO.File.WriteAllText(@"C:\Users\chase\Documents\twitch\dc\example.txt", deathCount.ToString());
+        Debug.Log("Saved to playerprefs the game " + gameName + " - " + deathCount + "and saved to file");
     }
-    public void addGame(string name)
+    public void AddGame(string name)
     {
         gameName = name;
-        Debug.Log("name: " + gameName);
-        if(PlayerPrefs.HasKey(name)) // Game exists already
+        if (gameName.Length != 0)
         {
-            gameName = PlayerPrefs.GetString(name);
-            deathCount = PlayerPrefs.GetInt(name);
-            updatePrefs();
+            Debug.Log("name: " + gameName);
+
+            //if (PlayerPrefs.HasKey(name)) // Game exists already
+            if (gamesAndDeaths.ContainsKey(gameName))
+            {
+                Debug.Log("Playerprefs already has this game " + gameName);
+                deathCount = gamesAndDeaths[gameName];
+                Debug.Log(gameName + " with a death count of " + deathCount);
+                UpdatePrefs();
+            }
+            else // New game
+            {
+                gamesAndDeaths.Add(gameName, 0);
+                Debug.Log("New game, name is = " + gameName);
+                deathCount = 0;
+                UpdatePrefs();
+            }
+            gameNameText.text = gameName;
+            EnableAll();
         }
-        else // New game
+        else
         {
-            deathCount = 0;
-            updatePrefs();
+            Debug.Log("name was whitespace most likely, tisk tisk tisk");
         }
-        gameNameText.text = gameName;
     }
 
-    public void deleteGame()
+    public void DeleteGame()
     {
         PlayerPrefs.DeleteKey(gameName);
         gameNameText.text = "SET GAME FIRST";
@@ -61,7 +83,7 @@ public class DeathGame : MonoBehaviour
         System.IO.File.WriteAllText(@"C:\Users\chase\Documents\twitch\dc\example.txt", deathCount.ToString());
     }
 
-    public void deleteAllGames()
+    public void DeleteAllGames()
     {
         PlayerPrefs.DeleteAll();
         gameNameText.text = "SET GAME FIRST";
@@ -74,41 +96,56 @@ public class DeathGame : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        if(PlayerPrefs.HasKey(gameName))
+        string testString = PlayerPrefs.GetString("games");
+        Debug.Log(testString);
+        if (!gameSelected)
         {
-            Debug.Log("Game existed " + gameName);
-            gameNameText.text = gameName;
-            deathCountText.text = PlayerPrefs.GetInt(gameName).ToString();
-            deathCount = PlayerPrefs.GetInt(gameName);
+            Debug.Log("No game selected, disabled all");
+            DisableAll();
+            gameNameText.text = "Please select a game";
         }
-        else
-        {
-            Debug.Log("Game doesn't exist");
-            deathCountText.text = PlayerPrefs.GetInt(gameName, 0).ToString();
-            gameNameText.text = "SET GAME FIRST";
-            gameName = gameNameText.text;
-        }
+        PopulateList();
+
     }
 
     void PopulateList()
     {
-        dropdown.ClearOptions();
-        List <string> games = new List<string>();
-
+        //dropdown.ClearOptions();
     }
- 
+
     // Update is called once per frame
     void Update()
     {
-        if(Input.GetKeyDown(KeyCode.KeypadPlus))
+        if (gameSelected)
         {
-            addDeathCount();
+            if (Input.GetKeyDown(KeyCode.KeypadPlus))
+            {
+                AddDeathCount();
+            }
+            else if (Input.GetKeyDown(KeyCode.KeypadMinus))
+            {
+                MinusDeathCount();
+            }
         }
-        else if(Input.GetKeyDown(KeyCode.KeypadMinus))
-        {
-            minusDeathCount();
-        }
-    } 
+    }
+
+    private void DisableAll()
+    {
+        deaths.enabled = false;
+        add.enabled = false;
+        minus.enabled = false;
+        deleteAllBtn.enabled = false;
+        deleteGameBtn.enabled = false;
+    }
+
+    private void EnableAll()
+    {
+        deaths.enabled =        true;
+        add.enabled =           true;
+        minus.enabled =         true;
+        deleteAllBtn.enabled =  true;
+        deleteGameBtn.enabled = true;
+    }
 
 
 }

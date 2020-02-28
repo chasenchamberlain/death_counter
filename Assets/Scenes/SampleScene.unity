@@ -223,7 +223,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b7df93c0ad1ab84986b69866a87b28d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  deathCountText: {fileID: 1881636122}
   gameNameText: {fileID: 1659934176}
   dropdown: {fileID: 644708911}
   add: {fileID: 1871248503}
@@ -231,6 +230,7 @@ MonoBehaviour:
   deleteAllBtn: {fileID: 266159016}
   deleteGameBtn: {fileID: 1608696416}
   deaths: {fileID: 375610493}
+  inputGame: {fileID: 801743943}
 --- !u!4 &177821056
 Transform:
   m_ObjectHideFlags: 0
@@ -328,7 +328,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 177821055}
-        m_MethodName: deleteAllGames
+        m_MethodName: DeleteAllGames
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -692,7 +692,7 @@ MonoBehaviour:
     m_BestFit: 0
     m_MinSize: 10
     m_MaxSize: 40
-    m_Alignment: 0
+    m_Alignment: 4
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 0
@@ -1444,7 +1444,7 @@ GameObject:
   - component: {fileID: 801743944}
   - component: {fileID: 801743943}
   m_Layer: 5
-  m_Name: InputField
+  m_Name: inputGame
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1526,7 +1526,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 177821055}
         m_MethodName: AddGame
-        m_Mode: 5
+        m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -2299,7 +2299,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 177821055}
-        m_MethodName: deleteGame
+        m_MethodName: DeleteGame
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2578,7 +2578,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 177821055}
-        m_MethodName: addDeathCount
+        m_MethodName: AddDeathCount
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2636,7 +2636,7 @@ GameObject:
   - component: {fileID: 1881636121}
   - component: {fileID: 1881636122}
   m_Layer: 5
-  m_Name: Text
+  m_Name: deathCountText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2936,7 +2936,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 177821055}
-        m_MethodName: minusDeathCount
+        m_MethodName: MinusDeathCount
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

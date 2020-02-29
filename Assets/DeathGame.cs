@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Linq;
+using System;
 
 public class DeathGame : MonoBehaviour
 {
@@ -18,6 +19,7 @@ public class DeathGame : MonoBehaviour
     public InputField deaths;
     public InputField inputGame;
 
+    public Action action; 
     private bool gameSelected = false;
 
     private Dictionary<string, int> gamesAndDeaths = new Dictionary<string, int>();
@@ -34,11 +36,20 @@ public class DeathGame : MonoBehaviour
         UpdatePrefs();
     }
 
+    public void EditDeathCount(string newCount)
+    {
+        if (!string.IsNullOrEmpty(newCount.Trim()))
+        {
+            gamesAndDeaths[gameName] = int.Parse(newCount);
+        }
+        UpdatePrefs();
+    }
 
     void UpdatePrefs()
     {
         if (gameSelected)
         {
+            gameNameText.text = gameName;
             deaths.text = gamesAndDeaths[gameName].ToString();
             System.IO.File.WriteAllText(@"C:\Users\chase\Documents\twitch\dc\example.txt", gamesAndDeaths[gameName].ToString());
             Debug.Log($"Saved to playerprefs the game {gameName}:{gamesAndDeaths[gameName]} and saved to file");
@@ -58,13 +69,14 @@ public class DeathGame : MonoBehaviour
             if (gamesAndDeaths.ContainsKey(gameName))
             {
                 Debug.Log($"Already have the game {gameName} with a count of {gamesAndDeaths[gameName]}");
-                UpdatePrefs();
+                FindDropdownIndex();
             }
             else // New game
             {
                 gamesAndDeaths.Add(gameName, 0);
                 Debug.Log($"New game = {gameName}");
                 UpdatePrefs();
+                PopulateList();
             }
             gameNameText.text = gameName;
             EnableAll();
@@ -73,12 +85,15 @@ public class DeathGame : MonoBehaviour
         {
             Debug.Log("Name was whitespace most likely, tisk tisk tisk");
         }
+        inputGame.text = "";
     }
 
     public void DeleteGame()
     {
         gamesAndDeaths.Remove(gameName);
         DeleteingHousekeeping();
+        DropdownSelected(0);
+        dropdown.RefreshShownValue();
         System.IO.File.WriteAllText(@"C:\Users\chase\Documents\twitch\dc\example.txt", "0");
         Debug.Log("Erased game");
     }
@@ -99,6 +114,7 @@ public class DeathGame : MonoBehaviour
         deaths.text = "";
         inputGame.text = "";
         gameName = "";
+        PopulateList();
         DisableAll();
         UpdatePrefs();
     }
@@ -107,10 +123,11 @@ public class DeathGame : MonoBehaviour
     void Start()
     {
         string stringDict = PlayerPrefs.GetString("games");
-        if (stringDict.Length != 0)
+        if (!string.IsNullOrEmpty(stringDict.Trim()))
         {
             Debug.Log($"We got games bb = {stringDict}");
             gamesAndDeaths = MyUnserialize(stringDict);
+            DropdownSelected(0);
         }
         if (!gameSelected)
         {
@@ -119,12 +136,37 @@ public class DeathGame : MonoBehaviour
             gameNameText.text = "Please select a game";
         }
         PopulateList();
-
     }
 
     void PopulateList()
     {
-        //dropdown.ClearOptions();
+        dropdown.ClearOptions();
+        var gamesList = gamesAndDeaths.Keys.ToList();
+        dropdown.AddOptions(gamesList);
+    }
+
+    public void DropdownSelected(int index)
+    {
+        if (gamesAndDeaths.Count > 0)
+        {
+            var gamesList = gamesAndDeaths.Keys.ToList();
+            gameName = gamesList[index];
+            Debug.Log($"Dropdown selected {gameName}");
+            gameSelected = true;
+            EnableAll();
+            UpdatePrefs();
+        }
+    }
+
+    void FindDropdownIndex()
+    {
+        if (gamesAndDeaths.Count > 0)
+        {
+            var gamesList = gamesAndDeaths.Keys.ToList();
+            int index = gamesList.FindIndex(x => x.Equals(gameName));
+            Debug.Log($"found index in dropdown of {gameName} at postion {index}");
+            DropdownSelected(index);
+        }
     }
 
     // Update is called once per frame
@@ -145,20 +187,20 @@ public class DeathGame : MonoBehaviour
 
     private void DisableAll()
     {
-        deaths.enabled = false;
-        add.enabled = false;
-        minus.enabled = false;
-        deleteAllBtn.enabled = false;
-        deleteGameBtn.enabled = false;
+        deaths.interactable = false;
+        add.interactable = false;
+        minus.interactable = false;
+        deleteAllBtn.interactable = false;
+        deleteGameBtn.interactable = false;
     }
 
     private void EnableAll()
     {
-        deaths.enabled = true;
-        add.enabled = true;
-        minus.enabled = true;
-        deleteAllBtn.enabled = true;
-        deleteGameBtn.enabled = true;
+        deaths.interactable = true;
+        add.interactable = true;
+        minus.interactable = true;
+        deleteAllBtn.interactable = true;
+        deleteGameBtn.interactable = true;
     }
 
     private string MySerialize(Dictionary<string, int> dict)
